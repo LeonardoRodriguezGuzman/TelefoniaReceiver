@@ -3,6 +3,7 @@ package com.lrgs18120163.telefoniareceiver
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -69,14 +70,12 @@ fun MainScreen(modifier: Modifier = Modifier) {
     var hasPermissions by remember {
         mutableStateOf(checkPermissions(context))
     }
-
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions(),
-        onResult = { permissions ->
+        onResult = { _ ->
             hasPermissions = checkPermissions(context)
         }
     )
-
     if(!hasPermissions){
         RequestPermissionsButton(launcher)
     }else{
@@ -88,7 +87,7 @@ fun MainScreen(modifier: Modifier = Modifier) {
         OutlinedTextField(
             value = numero,
             onValueChange = { numero = it },
-            label = { Text("Phone Number") }
+            label = { Text("Número") }
         )
         OutlinedTextField(
             value = mensaje,
@@ -101,6 +100,7 @@ fun MainScreen(modifier: Modifier = Modifier) {
             editor.putString("numero", numero)
             editor.putString("mensaje", mensaje)
             editor.apply()
+            Toast.makeText(context, "Datos guardados", Toast.LENGTH_SHORT).show()
         })
         {
             Text("Guardar")
@@ -111,11 +111,15 @@ fun MainScreen(modifier: Modifier = Modifier) {
 
 @Composable
 fun RequestPermissionsButton(launcher: ManagedActivityResultLauncher<Array<String>, Map<String, @JvmSuppressWildcards Boolean>>) {
-    Button(onClick = {
-        launcher.launch(arrayOf(android.Manifest.permission.SEND_SMS, android.Manifest.permission.READ_PHONE_STATE))
-    }) {
-        Text("Solicitar Permisos")
-    }
+    Box(modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center // Centra el contenido dentro del Box
+    ){
+        Button(onClick = {
+            launcher.launch(arrayOf(android.Manifest.permission.SEND_SMS, android.Manifest.permission.READ_PHONE_STATE))
+            }) {
+            Text("Solicitar Permisos")
+        }
+}
 }
 
 fun checkPermissions(context: Context): Boolean {
